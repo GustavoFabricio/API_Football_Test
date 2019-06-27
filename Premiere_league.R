@@ -16,9 +16,9 @@ library(dplyr)
 library(ggplot2)
 #
 library(tidyr)
-
-
-
+library(reshape)
+library(lattice)  
+  
 #### Creating df with the Premiere League Champions ####
 
 #GET the API
@@ -73,7 +73,7 @@ df.PL.Teams$class1 <- case_when(df.PL.Teams$name %in% c("Manchester City FC","Li
                                 TRUE ~ 'C')
 
 
-#Unnest all columns from df.PL.Matches_S18
+#Unnest all columns from df.PL.Matches_S18 (not the best way to do that)
 
 season <- unnest(df.PL.Matches_S18$season)
 colnames(season) <- c("season_id", "season_startDate", "season_endDate", "season_currentMatchday")
@@ -107,7 +107,7 @@ rm(score_half)
 rm(score_full)
 
 
-
+#Join the teams class
 df.PL.Matches_S18_v2 <- left_join(df.PL.Matches_S18_v2 ,df.PL.Teams , by = c("homeTeam_id" = "id"))
 df.PL.Matches_S18_v2 <- select(df.PL.Matches_S18_v2,-c("crestUrl", "name"))
 colnames(df.PL.Matches_S18_v2)[22] <- "homeTeam_class"
@@ -121,13 +121,16 @@ names(df.PL.Matches_S18_v2)
 
 names(df.PL.Matches_S18_v2)
 
+
+#Grouping the Teams class Matches and calculating the %
 Matches_analysis <- df.PL.Matches_S18_v2 %>% 
                     group_by(winner, homeTeam_class, awayTeam_class) %>% 
                     summarise(qtd = n())
 
 Matches_analysis <- df.PL.Matches_S18_v2 %>% 
   group_by(winner, homeTeam_class, awayTeam_class) %>% 
-  summarise(qtd = n())
+  summarise(
+    qtd = n())
 
 Matches_count <- df.PL.Matches_S18_v2 %>% 
   group_by(homeTeam_class, awayTeam_class) %>% 
@@ -135,5 +138,25 @@ Matches_count <- df.PL.Matches_S18_v2 %>%
 
 Matches_analysis <- left_join(Matches_analysis ,Matches_count , by = c("homeTeam_class"="homeTeam_class","awayTeam_class" = "awayTeam_class"))
 
-
 Matches_analysis$Pct <- Matches_analysis$qtd/Matches_analysis$Tot
+
+
+#Pivot table (by Column winner keeping %)
+Matches_analysis <- cast(Matches_analysis, homeTeam_class+awayTeam_class~winner)
+
+
+
+### Preparing data for Heat Map
+## Matrix 
+m <-data.matrix(x, rownames.force = NA)
+rownames(m)=c(paste(Matches_analysis$homeTeam_class, " x ", Matches_analysis$awayTeam_class ))
+
+
+## Doing a colot Palette
+col.l <- colorRampPalette(c('red','white', 'darkblue'))(30)
+
+## Heat Map
+levelplot(t(m),col.regions=col.l, xlab="Winner", ylab="Matches", main='Heat Map Winner by Team Class Matches',
+          scales=list(x=list(cex=.5), y=list(cex=.5), xlab=list(cex=.1), ylab=list(cex=.1)))
+
+
