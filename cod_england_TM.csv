@@ -1,48 +1,48 @@
-Club;Cod
-fc-arsenal;11
-derby-county-fc;22
-fc-everton;29
-fc-liverpool;31
-tottenham-hotspur;148
-blackburn-rovers-fc;164
-fc-southampton;180
-manchester-city-fc;281
-afc-sunderland;289
-birmingham-city-fc;337
-fc-barnsley;349
-sheffield-united-fc;350
-bolton-wanderers;355
-charlton-athletic;358
-west-ham-united;379
-leeds-united-fc;399
-aston-villa-fc;405
-preston-north-end-fc;466
-stoke-city;512
-wolverhampton-wanderers;543
-cardiff-city;603
-chelsea-fc;631
-fc-middlesbrough;641
-bristol-city-fc;698
-nottingham-forest;703
-newcastle-united;762
-crystal-palace-fc;873
-fc-fulham;931
-manchester-united-fc;985
-bournemouth-afc;989
-leicester-city-fc;1003
-fc-watford;1010
-millwall-fc;1028
-luton-town;1031
-fc-reading;1032
-sheffield-wednesday;1035
-queens-park-rangers;1039
-wigan-athletic;1071
-huddersfield-town;1110
-west-bromwich-albion;984
-norwich-city;1123
-fc-burnley;1132
-brentford-fc;1148
-blackpool-fc;1181
-brighton-albion;1237
-swansea-city-afc;2288
-hull-city;3008
+Club_Match,Club,Cod
+Arsenal,fc-arsenal,11
+Aston Villa,aston-villa-fc,405
+Birmingham,birmingham-city-fc,337
+Blackburn,blackburn-rovers-fc,164
+Blackpool,blackpool-fc,1181
+Bolton,bolton-wanderers,355
+Bournemouth,bournemouth-afc,989
+Brentford ,brentford-fc,1148
+Brighton,brighton-albion,1237
+Bristol City,bristol-city-fc,698
+Burnley,fc-burnley,1132
+Cardiff,cardiff-city,603
+Charlton,charlton-athletic,358
+Chelsea,chelsea-fc,631
+Crystal Palace,crystal-palace-fc,873
+Derby,derby-county-fc,22
+Everton,fc-everton,29
+FC Barnsley,fc-barnsley,349
+Fulham,fc-fulham,931
+Huddersfield,huddersfield-town,1110
+Hull City,hull-city,3008
+Leeds,leeds-united-fc,399
+Leicester,leicester-city-fc,1003
+Liverpool,fc-liverpool,31
+Luton Town,luton-town,1031
+Man City,manchester-city-fc,281
+Man Utd,manchester-united-fc,985
+Middlesbrough,fc-middlesbrough,641
+Millwall,millwall-fc,1028
+Newcastle,newcastle-united,762
+Norwich,norwich-city,1123
+Nottm Forest,nottingham-forest,703
+Preston NE,preston-north-end-fc,466
+QPR,queens-park-rangers,1039
+Reading,fc-reading,1032
+Sheff Wed,sheffield-wednesday,1035
+Sheffield Utd.,sheffield-united-fc,350
+Southampton,fc-southampton,180
+Spurs,tottenham-hotspur,148
+Stoke City,stoke-city,512
+Sunderland,afc-sunderland,289
+Swansea,swansea-city-afc,2288
+Watford,fc-watford,1010
+West Brom,west-bromwich-albion,984
+West Ham,west-ham-united,379
+Wigan,wigan-athletic,1071
+Wolves,wolverhampton-wanderers,543
