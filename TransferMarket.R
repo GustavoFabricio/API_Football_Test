@@ -7,10 +7,12 @@ require(dplyr)
 require(tidyr)
 require(stringr)
 
+setwd("D:/01_Projetos/04_Premiere_League/API_Football_Test")
+
 getwd()
 #C:/Users/gfabrici/Documents/Cursos/Aleatorios/API_Football_ORG/API_Football_Test
 
-cod_england_TM <- read.csv('cod_england_TM.csv', sep = ';',stringsAsFactors = FALSE)
+cod_england_TM <- read.csv('cod_england_TM.csv', sep = ',',stringsAsFactors = FALSE)
 
 PastSeasons <- seq(2010,2018,1)
 
@@ -82,7 +84,7 @@ df2 <- data.frame(Position, Number, Birth, Height, Foot, Joined, Value)
 df <- cbind(df1,df2)
   
 df$Season <- TeamsFull$Season[j]
-df$Team <- TeamsFull$Teams[j]
+df$Team <- TeamsFull$Club_Match[j]
 
 Players <- bind_rows(Players,df)
 }
@@ -96,8 +98,8 @@ Players <- bind_rows(Players,df)
 
 Players <- Players %>% separate(Birth, into = c("BirthDate", "Age"), sep = "(?<=^\\S{0,1000})\\s+")
      
-Players$age <- gsub('(','', Players$age, fixed = TRUE)
-Players$age <- as.numeric(gsub(')','', Players$age, fixed = TRUE))
+Players$Age <- gsub('(','', Players$Age, fixed = TRUE)
+Players$Age <- as.numeric(gsub(')','', Players$Age, fixed = TRUE))
 
 #BirthDate
 
@@ -193,8 +195,10 @@ scraped_page <- read_html(url)
 MatchDay  <- scraped_page %>% html_nodes("td.zentriert:nth-child(1)") %>% html_text() %>% as.character() %>% trimws("r", whitespace = "[\\h\\v]")%>% trimws("l", whitespace = "[\\h\\v]") 
 Date      <- scraped_page %>% html_nodes(".responsive-table td:nth-child(2)") %>% html_text() %>% as.character()
 Time      <- scraped_page %>% html_nodes(".responsive-table td:nth-child(3)") %>% html_text() %>% as.character()
-HomeTeam  <- scraped_page %>% html_nodes(".no-border-links:nth-child(5)") %>% html_text() %>% as.character()
-AwayTeam  <- scraped_page %>% html_nodes(".no-border-links:nth-child(7)") %>% html_text() %>% as.character()
+HomeTeam  <- scraped_page %>% html_nodes(".no-border-links:nth-child(5)") %>% html_text() %>% as.character() %>% 
+             trimws("r", whitespace = "[\\h\\v]") %>% trimws("l", whitespace = "[\\h\\v]")
+AwayTeam  <- scraped_page %>% html_nodes(".no-border-links:nth-child(7)") %>% html_text() %>% as.character() %>% 
+             trimws("r", whitespace = "[\\h\\v]") %>% trimws("l", whitespace = "[\\h\\v]")
 
 Formation  <- scraped_page %>% html_nodes(".zentriert:nth-child(8)") %>% html_text() %>% as.character()
 Manager    <- scraped_page %>% html_nodes("td:nth-child(9)") %>% html_text() %>% as.character()
@@ -205,11 +209,53 @@ Result     <- scraped_page %>% html_nodes(".rechts+ td") %>% html_text() %>% as.
 
 df1 <- data.frame(MatchDay, Date, Time, HomeTeam, AwayTeam, Formation, Manager, Attendence, Result, stringsAsFactors = FALSE)
 
-df1$TeamMatches <- TeamsFull$Teams[j]
+df1$TeamMatches <- TeamsFull$Club_Match[j]
 df1$Season <- TeamsFull$Season[j]
 
 Matches <- bind_rows(Matches, df1)
 }
 
 PremiereMatches <- Matches %>% filter(MatchDay %in% as.character(seq(1,38,1)))
-table(Matches$MatchDay)
+
+PremiereMatches <- PremiereMatches %>% separate(HomeTeam, c("HomeTeam", "HomeTeamPos"), "[(]" ) %>%
+                   mutate(HomeTeamPos = gsub(".)", "", HomeTeamPos)) %>%
+                   mutate(HomeTeam = gsub("^\\s+|\\s+$", "", HomeTeam))
+
+PremiereMatches <- PremiereMatches %>% separate(AwayTeam, c("AwayTeam", "AwayTeamPos"), "[(]" ) %>%
+                   mutate(AwayTeamPos = gsub(".)", "", AwayTeamPos)) %>% 
+                   mutate(AwayTeam = gsub("^\\s+|\\s+$", "", AwayTeam))
+
+PremiereMatches <- PremiereMatches %>% separate(Result, c("HomeTeamScore", "AwayTeamScore"), "[:]" ) %>% 
+                   mutate(HomeTeamScore = as.numeric(HomeTeamScore)) %>%
+                   mutate(AwayTeamScore = as.numeric(AwayTeamScore))
+
+PremiereMatches$WinnerHA <- NULL
+
+PremiereMatches <- PremiereMatches %>% mutate( WinnerHA = case_when(AwayTeamScore > HomeTeamScore ~ "AWAY",
+                                                 AwayTeamScore < HomeTeamScore ~ "HOME",
+                                                 AwayTeamScore == HomeTeamScore ~ "DRAW",
+                                                 TRUE ~ "X"))
+
+PremiereMatches$WinnerTeam <- NULL
+
+PremiereMatches <- PremiereMatches %>% mutate( WinnerTeam = case_when(AwayTeamScore > HomeTeamScore ~ AwayTeam,
+                                                                    AwayTeamScore < HomeTeamScore ~ HomeTeam,
+                                                                    AwayTeamScore == HomeTeamScore ~ "DRAW",
+                                                                    TRUE ~ "X"))
+
+
+PremiereMatches <- PremiereMatches[with(PremiereMatches, order(Season, MatchDay, HomeTeam)), ]
+
+unique(PremiereMatches$HomeTeam)
+unique(PremiereMatches$Team)
+
+
+url = "https://www.transfermarkt.com.br/leeds-united-fc/spielplan/verein/399/saison_id/2019/plus/1#GB2"
+scraped_page <- read_html(url)
+
+Teams <- scraped_page %>% html_nodes(".no-border-links:nth-child(5)") %>% html_text() %>% as.character()
+
+
+unique(Teams)
+
+
