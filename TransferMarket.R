@@ -246,6 +246,49 @@ PremiereMatches <- PremiereMatches %>% mutate( WinnerTeam = case_when(AwayTeamSc
 
 PremiereMatches <- PremiereMatches[with(PremiereMatches, order(Season, MatchDay, HomeTeam)), ]
 
+nrow(PremiereMatches)
+
+x <- seq(2,nrow(PremiereMatches),2)
+
+y <- seq(1,nrow(PremiereMatches)-1,2)
+
+df1 <- PremiereMatches[x,]
+df2 <- PremiereMatches[y,]
+
+names(df2) <- c("MatchDay", "Date", "Time", "HomeTeam", "HomeTeamPos", "AwayTeam", "AwayTeamPos", "Formation_b", "Manager_b", "Attendence", "HomeTeamScore", "AwayTeamScore", "TeamMatches_b", "Season", "WinnerHA", "WinnerTeam")
+
+PremiereMatches <- left_join(df1, select(df2,"MatchDay", "HomeTeam", "AwayTeam", "Season","Formation_b", "Manager_b", "TeamMatches_b"), by = c("MatchDay", "HomeTeam", "AwayTeam", "Season"))
+
+PremiereMatches$HomeManager <- NULL
+PremiereMatches <- PremiereMatches %>% mutate(HomeManager = case_when(TeamMatches == HomeTeam ~ Manager,
+                                                                              TeamMatches_b == HomeTeam ~ Manager_b,
+                                                                              TRUE ~ "X"))
+PremiereMatches$AwayManager <- NULL
+PremiereMatches <- PremiereMatches %>% mutate(AwayManager = case_when(TeamMatches   == AwayTeam ~ Manager,
+                                                                      TeamMatches_b == AwayTeam ~ Manager_b,                                                           
+                                                                      TRUE ~ "X"))
+
+
+
+PremiereMatches$HomeFormation <- NULL
+PremiereMatches <- PremiereMatches %>% mutate(HomeFormation = case_when(TeamMatches == HomeTeam ~ Formation,
+                                                                      TeamMatches_b == HomeTeam ~ Formation_b,
+                                                                      TRUE ~ "X"))
+PremiereMatches$AwayFormation <- NULL
+PremiereMatches <- PremiereMatches %>% mutate(AwayFormation = case_when(TeamMatches   == AwayTeam ~ Formation,
+                                                                      TeamMatches_b == AwayTeam ~ Formation_b,                                                           
+                                                                      TRUE ~ "X"))
+
+PremiereMatches <- select(PremiereMatches, -c("Formation_b", "Manager_b", "TeamMatches_b","Manager", "Formation", "TeamMatches")) 
+
+PremiereMatches <- select(PremiereMatches, c("Season","MatchDay","Date","Time","Attendence"
+                                             ,"HomeTeamPos","HomeTeam","HomeTeamScore","AwayTeamPos"
+                                             ,"AwayTeam","AwayTeamScore","HomeManager","HomeFormation"
+                                             ,"AwayManager","AwayFormation","WinnerHA","WinnerTeam")) 
+
+names(PremiereMatches)
+
+
 unique(PremiereMatches$HomeTeam)
 unique(PremiereMatches$Team)
 
